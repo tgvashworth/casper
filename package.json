@@ -1,6 +1,6 @@
 {
   "name": "capishe",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Utilities for building APIs in express.",
   "main": "index.js",
   "scripts": {
