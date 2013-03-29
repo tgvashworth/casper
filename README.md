@@ -2,6 +2,8 @@
 
 Helpers and handlers for building jsonp APIs in express
 
+[![build status](https://secure.travis-ci.org/phuu/capishe.png)](http://travis-ci.org/phuu/capishe)
+
 ## example
 
 The following examples assume this:
