@@ -1,0 +1,16 @@
+{
+  "name": "capishe",
+  "version": "0.0.0",
+  "description": "Utilities for API building.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap ./test"
+  },
+  "repository": "",
+  "author": "Tom Ashworth",
+  "license": "MIT",
+  "devDependencies": {
+    "underscore": "~1.4.4",
+    "tap": "~0.4.1"
+  }
+}
