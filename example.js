@@ -135,3 +135,14 @@ app.get('/',
 app.get('/',
         capishe.rm('testKey'),
         capishe.noop());
+
+// ==================================
+// Logging
+// ==================================
+app.get('/:testParam',
+        capishe.log.the('params'),
+        capishe.noop());
+
+app.get('/:testParam',
+        capishe.log.the('params.testParam'),
+        capishe.noop());

@@ -117,4 +117,44 @@ capishe.error.badRequest = function (msg) {
   };
 };
 
+// ==================================
+// Logging
+// ==================================
+
+capishe.log = {};
+
+// ==================================
+// Log a key from the request
+// ==================================
+capishe.log.the = function (key) {
+  return function (req, res, next) {
+    console.log(key, capishe.util.byString(req, key));
+    next();
+  };
+};
+
+// ==================================
+// Utils
+// ==================================
+
+capishe.util = {};
+
+// ==================================
+// Access object key via string
+// ==================================
+capishe.util.byString = function(o, s) {
+  s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+  s = s.replace(/^\./, '');           // strip a leading dot
+  var a = s.split('.');
+  while (a.length) {
+    var n = a.shift();
+    if (n in o) {
+      o = o[n];
+    } else {
+      return;
+    }
+  }
+  return o;
+};
+
 module.exports = capishe;
