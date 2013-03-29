@@ -239,6 +239,12 @@ test('utilities', function (t) {
       t.equal(res, 0, 'Data deeply nested retrieved correctly.');
       t.end();
     });
+    t.test('sets value of object', function (t) {
+      var data = { a: [ { b: 0 }, 10, 20 ] };
+      var res = capishe.util.atString(data, 'a[0].b', 10);
+      t.equal(data.a[0].b, 10, 'Data deeply nested modified correctly.');
+      t.end();
+    });
     t.end();
   });
   t.end();

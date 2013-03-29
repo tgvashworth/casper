@@ -142,19 +142,25 @@ capishe.util = {};
 // ==================================
 // Access object key via string
 // ==================================
-capishe.util.atString = function(o, s) {
-  s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-  s = s.replace(/^\./, '');           // strip a leading dot
-  var a = s.split('.');
-  while (a.length) {
-    var n = a.shift();
-    if (n in o) {
-      o = o[n];
+capishe.util.atString = function(obj, str, val) {
+  var args = [].slice.call(arguments);
+  str = str.replace(/\[(\w+)\]/g, '.$1')
+           .replace(/^\./, '');
+  var arr = str.split('.'),
+      parent, key;
+  while (arr.length) {
+    key = arr.shift();
+    if (key in obj) {
+      parent = obj;
+      obj = obj[key];
     } else {
       return;
     }
   }
-  return o;
+  if (args.length > 2) {
+    parent[key] = val;
+  }
+  return obj;
 };
 
 module.exports = capishe;
