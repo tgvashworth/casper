@@ -218,3 +218,23 @@ app.get('/:testParam',
 app.get('/:testParam',
         capishe.log.the('params.testParam'),
         capishe.noop());
+
+// ==================================
+// Utils
+// ==================================
+test('utilities', function (t) {
+  t.test('byString', function (t) {
+    t.test('nested objects', function (t) {
+      var res = capishe.util.byString({ a: { b: 20 } }, 'a.b');
+      t.equal(res, 20, 'Data in nested object retrieved correctly.');
+      t.end();
+    });
+    t.test('nested array', function (t) {
+      var res = capishe.util.byString({ a: [ 0, 10, 20 ] }, 'a[1]');
+      t.equal(res, 10, 'Data in nested array retrieved correctly.');
+      t.end();
+    });
+    t.end();
+  });
+  t.end();
+});
