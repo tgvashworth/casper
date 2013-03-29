@@ -234,6 +234,11 @@ test('utilities', function (t) {
       t.equal(res, 10, 'Data in nested array retrieved correctly.');
       t.end();
     });
+    t.test('deply nested object in array', function (t) {
+      var res = capishe.util.byString({ a: [ { b: 0 }, 10, 20 ] }, 'a[0].b');
+      t.equal(res, 0, 'Data deeply nested retrieved correctly.');
+      t.end();
+    });
     t.end();
   });
   t.end();
