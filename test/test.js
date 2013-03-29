@@ -193,12 +193,20 @@ test('checks & filters', function (t) {
     t.end();
   });
 
+  t.test('key is removed from body', function (t) {
+    setup();
+    var spy = sinon.spy(capishe.noop());
+    app.get('/',
+            capishe.rm('testKey'),
+            function (req, res) {
+              t.notOk(req.body.testKey, 'Test key removed.');
+              t.end();
+            });
+  });
+
   t.end();
 });
 
-app.get('/',
-        capishe.rm('testKey'),
-        capishe.noop());
 
 // ==================================
 // Logging
