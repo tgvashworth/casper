@@ -1,7 +1,7 @@
 {
   "name": "capishe",
-  "version": "0.0.0",
-  "description": "Utilities for API building.",
+  "version": "0.0.1",
+  "description": "Utilities for building APIs in express.",
   "main": "index.js",
   "scripts": {
     "test": "tap ./test"
