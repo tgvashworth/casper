@@ -11,6 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "underscore": "~1.4.4",
-    "tap": "~0.4.1"
+    "tap": "~0.4.1",
+    "sinon": "~1.6.0"
   }
 }
