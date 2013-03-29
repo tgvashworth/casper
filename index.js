@@ -128,7 +128,7 @@ capishe.log = {};
 // ==================================
 capishe.log.the = function (key) {
   return function (req, res, next) {
-    console.log(key, capishe.util.byString(req, key));
+    console.log(key, capishe.util.atString(req, key));
     next();
   };
 };
@@ -142,7 +142,7 @@ capishe.util = {};
 // ==================================
 // Access object key via string
 // ==================================
-capishe.util.byString = function(o, s) {
+capishe.util.atString = function(o, s) {
   s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
   s = s.replace(/^\./, '');           // strip a leading dot
   var a = s.split('.');
