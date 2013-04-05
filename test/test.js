@@ -21,7 +21,9 @@ app.get = app.post = function (path) {
   var req = {};
   req.params = [];
   req.body = {
-    testKey: true
+    testKey: true,
+    stringKey: 'tom',
+    numKey: 10
   };
 
   req.params = (path.match(/[a-zA-Z]+/g) || []).reduce(function (memo, param) {
@@ -198,6 +200,29 @@ test('checks & filters', function (t) {
     var spy = sinon.spy(capishe.noop());
     app.get('/',
             capishe.rm('testKey'),
+            function (req, res) {
+              t.notOk(req.body.testKey, 'Test key removed.');
+              t.end();
+            });
+  });
+
+  t.test('only supplied key is allowed in body', function (t) {
+    setup();
+    var spy = sinon.spy(capishe.noop());
+    app.get('/',
+            capishe.allow.body('stringKey'),
+            function (req, res) {
+              t.notOk(req.body.testKey, 'Test key removed.');
+              t.notOk(req.body.numKey, 'Test key removed.');
+              t.end();
+            });
+  });
+
+  t.test('only array of keys are allowed in body', function (t) {
+    setup();
+    var spy = sinon.spy(capishe.noop());
+    app.get('/',
+            capishe.allow.body(['stringKey', 'numKey']),
             function (req, res) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.end();

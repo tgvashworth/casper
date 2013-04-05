@@ -103,6 +103,24 @@ capishe.rm = function (key) {
 };
 
 // ==================================
+// Only allow certain keys on the body
+// ==================================
+capishe.allow = {};
+
+capishe.allow.body = function (keys) {
+  if (typeof keys === 'string') keys = [keys];
+  return function (req, res, next) {
+    // Remove all unwanted keys from the body
+    Object.keys(req.body).forEach(function (key) {
+      if (keys.indexOf(key) === -1) {
+        delete req.body[key];
+      }
+    });
+    next();
+  };
+};
+
+// ==================================
 // Errors
 // ==================================
 
