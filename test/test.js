@@ -199,7 +199,7 @@ test('checks & filters', function (t) {
     setup();
     var spy = sinon.spy(casper.noop());
     app.get('/',
-            casper.rm('testKey'),
+            casper.rm.body('testKey'),
             function (req, res) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.end();

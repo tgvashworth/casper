@@ -83,17 +83,22 @@ casper.check.body = function (key, cb) {
     if (!cbPassed || !req.body[key]) {
       return casper
                .error
-               .badRequest('Missing ' + key + ' key from body.')(req, res);
+               .badRequest('Missing ' + key + ' from body.')(req, res);
     }
     next();
   };
 };
 
+// ==================================
+// Remove
+// ==================================
+
+casper.rm = {};
 
 // ==================================
 // Remove key from req.body
 // ==================================
-casper.rm = function (key) {
+casper.rm.body = function (key) {
   return function (req, res, next) {
     if (req.body[key]) {
       delete req.body[key];
@@ -103,9 +108,14 @@ casper.rm = function (key) {
 };
 
 // ==================================
+// Allow
+// ==================================
+
+casper.allow = {};
+
+// ==================================
 // Only allow certain keys on the body
 // ==================================
-casper.allow = {};
 
 casper.allow.body = function (keys) {
   if (typeof keys === 'string') keys = [keys];
