@@ -1,12 +1,12 @@
 {
-  "name": "capishe",
-  "version": "0.0.4",
-  "description": "Utilities for building APIs in express.",
+  "name": "casper",
+  "version": "0.0.5",
+  "description": "Helpers and handlers for building APIs in express.",
   "main": "index.js",
   "scripts": {
     "test": "tap ./test"
   },
-  "repository": "",
+  "repository": "git@github.com:phuu/casper.git",
   "author": "Tom Ashworth",
   "license": "MIT",
   "devDependencies": {

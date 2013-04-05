@@ -1,4 +1,4 @@
-var capishe = {};
+var casper = {};
 
 // ==================================
 // General
@@ -7,7 +7,7 @@ var capishe = {};
 // ==================================
 // Send data or and empty response
 // ==================================
-capishe.noop = function (data) {
+casper.noop = function (data) {
   return function (req, res) {
     res.jsonp(data || {});
   };
@@ -20,7 +20,7 @@ capishe.noop = function (data) {
 // ==================================
 // Generic database response handler.
 // ==================================
-capishe.db = function (req, res, cb) {
+casper.db = function (req, res, cb) {
   return function (err, data) {
     if (err) {
       return (cb ? cb(err, data) : res.jsonp(500, { error: err.message }));
@@ -39,7 +39,7 @@ capishe.db = function (req, res, cb) {
 // ==================================
 // Generic model creator
 // ==================================
-capishe.create = function (Model, data, allowBody) {
+casper.create = function (Model, data, allowBody) {
   return function (req, res) {
     var raw = new Model(data || (allowBody ? req.body : {}));
     raw.save(function (err, obj) {
@@ -53,18 +53,18 @@ capishe.create = function (Model, data, allowBody) {
 // Checks & filters
 // ==================================
 
-capishe.check = {};
+casper.check = {};
 
 // ==================================
 // Parameter checking callback
 // Optional checking function. Defaults to truth checking with !
 // ==================================
-capishe.check.params = function (param, cb) {
+casper.check.params = function (param, cb) {
   return function (req, res, next) {
     var cbPassed = true;
     if (cb) cbPassed = cb(param, req.params);
     if (!cbPassed || !req.params[param]) {
-      return capishe
+      return casper
                .error
                .badRequest('Missing ' + param + ' URL parameter.')(req, res);
     }
@@ -76,12 +76,12 @@ capishe.check.params = function (param, cb) {
 // Body checking.
 // Like above, suports cb checking function.
 // ==================================
-capishe.check.body = function (key, cb) {
+casper.check.body = function (key, cb) {
   return function (req, res, next) {
     var cbPassed = true;
     if (cb) cbPassed = cb(key, req.body);
     if (!cbPassed || !req.body[key]) {
-      return capishe
+      return casper
                .error
                .badRequest('Missing ' + key + ' key from body.')(req, res);
     }
@@ -93,7 +93,7 @@ capishe.check.body = function (key, cb) {
 // ==================================
 // Remove key from req.body
 // ==================================
-capishe.rm = function (key) {
+casper.rm = function (key) {
   return function (req, res, next) {
     if (req.body[key]) {
       delete req.body[key];
@@ -105,9 +105,9 @@ capishe.rm = function (key) {
 // ==================================
 // Only allow certain keys on the body
 // ==================================
-capishe.allow = {};
+casper.allow = {};
 
-capishe.allow.body = function (keys) {
+casper.allow.body = function (keys) {
   if (typeof keys === 'string') keys = [keys];
   return function (req, res, next) {
     // Remove all unwanted keys from the body
@@ -124,12 +124,12 @@ capishe.allow.body = function (keys) {
 // Errors
 // ==================================
 
-capishe.error = {};
+casper.error = {};
 
 // ==================================
 // 400 Bad Request
 // ==================================
-capishe.error.badRequest = function (msg) {
+casper.error.badRequest = function (msg) {
   return function (req, res) {
     res.jsonp(400, { error: msg || 'Bad request' });
   };
@@ -139,14 +139,14 @@ capishe.error.badRequest = function (msg) {
 // Logging
 // ==================================
 
-capishe.log = {};
+casper.log = {};
 
 // ==================================
 // Log a key from the request
 // ==================================
-capishe.log.the = function (key) {
+casper.log.the = function (key) {
   return function (req, res, next) {
-    console.log(key, capishe.util.atString(req, key));
+    console.log(key, casper.util.atString(req, key));
     next();
   };
 };
@@ -155,12 +155,12 @@ capishe.log.the = function (key) {
 // Utils
 // ==================================
 
-capishe.util = {};
+casper.util = {};
 
 // ==================================
 // Access object key via string
 // ==================================
-capishe.util.atString = function(obj, str, val) {
+casper.util.atString = function(obj, str, val) {
   var args = [].slice.call(arguments);
   str = str.replace(/\[(\w+)\]/g, '.$1')
            .replace(/^\./, '');
@@ -181,4 +181,4 @@ capishe.util.atString = function(obj, str, val) {
   return obj;
 };
 
-module.exports = capishe;
+module.exports = casper;

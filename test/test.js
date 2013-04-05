@@ -1,4 +1,4 @@
-var capishe = require('../index'),
+var casper = require('../index'),
     _ = require('underscore'),
     test = require('tap').test,
     sinon = require('sinon');
@@ -91,7 +91,7 @@ test('general', function (t) {
 
   t.test('noop with no data', function (t) {
     setup();
-    app.get('/', capishe.noop());
+    app.get('/', casper.noop());
     t.ok(res.jsonp.calledOnce, 'jsonp was called');
     t.ok(res.jsonp.calledWith({}), 'jsonp was called correct data');
     t.end();
@@ -100,7 +100,7 @@ test('general', function (t) {
   t.test('noop with no data', function (t) {
     setup();
     var data = { status: 'great' };
-    app.get('/', capishe.noop(data));
+    app.get('/', casper.noop(data));
     t.ok(res.jsonp.calledOnce, 'jsonp was called');
     t.ok(res.jsonp.calledWith(data), 'jsonp was called correct data');
     t.end();
@@ -121,7 +121,7 @@ test('database', function (t) {
     app.get('/', function (req, res) {
       FakeModel
         .find()
-        .exec(capishe.db(req, res));
+        .exec(casper.db(req, res));
     });
     t.ok(res.jsonp.calledOnce, 'jsonp was called once');
     t.end();
@@ -132,7 +132,7 @@ test('database', function (t) {
     app.get('/', function (req, res) {
       FakeModel
         .findWithError()
-        .exec(capishe.db(req, res));
+        .exec(casper.db(req, res));
     });
     t.ok(res.jsonp.withArgs(500).calledOnce, '500 jsonp was called once');
     t.end();
@@ -143,7 +143,7 @@ test('database', function (t) {
     app.get('/', function (req, res) {
       FakeModel
         .findWithNoResults()
-        .exec(capishe.db(req, res));
+        .exec(casper.db(req, res));
     });
     t.ok(res.jsonp.withArgs(404, []).calledOnce, '404 jsonp was called once');
     t.end();
@@ -154,7 +154,7 @@ test('database', function (t) {
     app.get('/', function (req, res) {
       FakeModel
         .findWithFalsyData()
-        .exec(capishe.db(req, res));
+        .exec(casper.db(req, res));
     });
     t.ok(res.jsonp.withArgs(404, {}).calledOnce, '404 jsonp was called once');
     t.end();
@@ -172,11 +172,11 @@ test('checks & filters', function (t) {
   t.test('missing parameter is caught', function (t) {
     setup();
     app.get('/',
-            capishe.check.params('testParam'),
-            capishe.noop());
+            casper.check.params('testParam'),
+            casper.noop());
     app.get('/:testParam',
-            capishe.check.params('testParam'),
-            capishe.noop());
+            casper.check.params('testParam'),
+            casper.noop());
     t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
     t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
     t.end();
@@ -185,11 +185,11 @@ test('checks & filters', function (t) {
   t.test('present parameter is allowed', function (t) {
     setup();
     app.get('/',
-            capishe.check.body('fakeKey'),
-            capishe.noop());
+            casper.check.body('fakeKey'),
+            casper.noop());
     app.get('/',
-            capishe.check.body('testKey'),
-            capishe.noop());
+            casper.check.body('testKey'),
+            casper.noop());
     t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
     t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
     t.end();
@@ -197,9 +197,9 @@ test('checks & filters', function (t) {
 
   t.test('key is removed from body', function (t) {
     setup();
-    var spy = sinon.spy(capishe.noop());
+    var spy = sinon.spy(casper.noop());
     app.get('/',
-            capishe.rm('testKey'),
+            casper.rm('testKey'),
             function (req, res) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.end();
@@ -208,9 +208,9 @@ test('checks & filters', function (t) {
 
   t.test('only supplied key is allowed in body', function (t) {
     setup();
-    var spy = sinon.spy(capishe.noop());
+    var spy = sinon.spy(casper.noop());
     app.get('/',
-            capishe.allow.body('stringKey'),
+            casper.allow.body('stringKey'),
             function (req, res) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.notOk(req.body.numKey, 'Test key removed.');
@@ -220,9 +220,9 @@ test('checks & filters', function (t) {
 
   t.test('only array of keys are allowed in body', function (t) {
     setup();
-    var spy = sinon.spy(capishe.noop());
+    var spy = sinon.spy(casper.noop());
     app.get('/',
-            capishe.allow.body(['stringKey', 'numKey']),
+            casper.allow.body(['stringKey', 'numKey']),
             function (req, res) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.end();
@@ -237,12 +237,12 @@ test('checks & filters', function (t) {
 // Logging
 // ==================================
 app.get('/:testParam',
-        capishe.log.the('params'),
-        capishe.noop());
+        casper.log.the('params'),
+        casper.noop());
 
 app.get('/:testParam',
-        capishe.log.the('params.testParam'),
-        capishe.noop());
+        casper.log.the('params.testParam'),
+        casper.noop());
 
 // ==================================
 // Utils
@@ -250,23 +250,23 @@ app.get('/:testParam',
 test('utilities', function (t) {
   t.test('atString', function (t) {
     t.test('nested objects', function (t) {
-      var res = capishe.util.atString({ a: { b: 20 } }, 'a.b');
+      var res = casper.util.atString({ a: { b: 20 } }, 'a.b');
       t.equal(res, 20, 'Data in nested object retrieved correctly.');
       t.end();
     });
     t.test('nested array', function (t) {
-      var res = capishe.util.atString({ a: [ 0, 10, 20 ] }, 'a[1]');
+      var res = casper.util.atString({ a: [ 0, 10, 20 ] }, 'a[1]');
       t.equal(res, 10, 'Data in nested array retrieved correctly.');
       t.end();
     });
     t.test('deply nested object in array', function (t) {
-      var res = capishe.util.atString({ a: [ { b: 0 }, 10, 20 ] }, 'a[0].b');
+      var res = casper.util.atString({ a: [ { b: 0 }, 10, 20 ] }, 'a[0].b');
       t.equal(res, 0, 'Data deeply nested retrieved correctly.');
       t.end();
     });
     t.test('sets value of object', function (t) {
       var data = { a: [ { b: 0 }, 10, 20 ] };
-      var res = capishe.util.atString(data, 'a[0].b', 10);
+      var res = casper.util.atString(data, 'a[0].b', 10);
       t.equal(data.a[0].b, 10, 'Data deeply nested modified correctly.');
       t.end();
     });
