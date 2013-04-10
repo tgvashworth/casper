@@ -23,7 +23,8 @@ app.get = app.post = function (path) {
   req.body = {
     testKey: true,
     stringKey: 'tom',
-    numKey: 10
+    numKey: 10,
+    zeroKey: 0
   };
 
   req.params = (path.match(/[a-zA-Z]+/g) || []).reduce(function (memo, param) {
@@ -182,7 +183,7 @@ test('checks & filters', function (t) {
     t.end();
   });
 
-  t.test('present parameter is allowed', function (t) {
+  t.test('body keys can be checked', function (t) {
     setup();
     app.get('/',
             casper.check.body('fakeKey'),
@@ -191,6 +192,15 @@ test('checks & filters', function (t) {
             casper.check.body('testKey'),
             casper.noop());
     t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
+    t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
+    t.end();
+  });
+
+  t.test('zero parameter is allowed', function (t) {
+    setup();
+    app.get('/',
+            casper.check.body('zeroKey'),
+            casper.noop());
     t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
     t.end();
   });

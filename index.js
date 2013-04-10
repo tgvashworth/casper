@@ -63,7 +63,7 @@ casper.check.params = function (param, cb) {
   return function (req, res, next) {
     var cbPassed = true;
     if (cb) cbPassed = cb(param, req.params);
-    if (!cbPassed || !req.params[param]) {
+    if (!cbPassed || typeof req.params[param] === "undefined") {
       return casper
                .error
                .badRequest('Missing ' + param + ' URL parameter.')(req, res);
@@ -80,7 +80,7 @@ casper.check.body = function (key, cb) {
   return function (req, res, next) {
     var cbPassed = true;
     if (cb) cbPassed = cb(key, req.body);
-    if (!cbPassed || !req.body[key]) {
+    if (!cbPassed || typeof req.body[key] === "undefined") {
       return casper
                .error
                .badRequest('Missing ' + key + ' from body.')(req, res);
