@@ -43,8 +43,8 @@ casper.create = function (Model, data, allowBody) {
   return function (req, res) {
     var raw = new Model(data || (allowBody ? req.body : {}));
     raw.save(function (err, obj) {
-      if (err) return res.send(500, err);
-      res.send(obj);
+      if (err) return res.jsonp(500, err);
+      res.jsonp(obj);
     });
   };
 };
