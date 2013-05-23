@@ -26,6 +26,9 @@ app.get = app.post = function (path) {
     numKey: 10,
     zeroKey: 0
   };
+  req.query = {
+    testQuery: true
+  };
 
   req.params = (path.match(/[a-zA-Z]+/g) || []).reduce(function (memo, param) {
     memo[param] = true;
@@ -237,6 +240,19 @@ test('checks & filters', function (t) {
               t.notOk(req.body.testKey, 'Test key removed.');
               t.end();
             });
+  });
+
+  t.test('missing query param is caught', function (t) {
+    setup();
+    app.get('/',
+            casper.check.query('testQuery'),
+            casper.noop());
+    app.get('/',
+            casper.check.query('missingQuery'),
+            casper.noop());
+    t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp was called once');
+    t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
+    t.end();
   });
 
   t.end();

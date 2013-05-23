@@ -90,6 +90,25 @@ casper.check.body = function (key, cb) {
 };
 
 // ==================================
+// Query checking.
+// Like above, suports cb checking function.
+// ==================================
+casper.check.query = function (key, cb) {
+  return function (req, res, next) {
+    console.log('query', req.query);
+    var cbPassed = true;
+    if (cb) cbPassed = cb(key, req.query);
+    if (!cbPassed || typeof req.query[key] === "undefined") {
+      console.log('MISSING');
+      return casper
+               .error
+               .badRequest('Missing ' + key + ' from query.')(req, res);
+    }
+    next();
+  };
+};
+
+// ==================================
 // Remove
 // ==================================
 
