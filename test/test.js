@@ -93,18 +93,18 @@ FakeModel.findWithFalsyData = function () {
 // ==================================
 test('general', function (t) {
 
-  t.test('noop with no data', function (t) {
+  t.test('send with no data', function (t) {
     setup();
-    app.get('/', casper.noop());
+    app.get('/', casper.send());
     t.ok(res.jsonp.calledOnce, 'jsonp was called');
     t.ok(res.jsonp.calledWith({}), 'jsonp was called correct data');
     t.end();
   });
 
-  t.test('noop with no data', function (t) {
+  t.test('send with data', function (t) {
     setup();
     var data = { status: 'great' };
-    app.get('/', casper.noop(data));
+    app.get('/', casper.send(data));
     t.ok(res.jsonp.calledOnce, 'jsonp was called');
     t.ok(res.jsonp.calledWith(data), 'jsonp was called correct data');
     t.end();
@@ -142,26 +142,39 @@ test('database', function (t) {
     t.end();
   });
 
-  t.test('sends 404 with no reults', function (t) {
-    setup();
-    app.get('/', function (req, res) {
-      FakeModel
-        .findWithNoResults()
-        .exec(casper.db(req, res));
-    });
-    t.ok(res.jsonp.withArgs(404, []).calledOnce, '404 jsonp was called once');
-    t.end();
-  });
-
-  t.test('sends 404 with no reults', function (t) {
+  t.test('sends 404 with falsey data', function (t) {
     setup();
     app.get('/', function (req, res) {
       FakeModel
         .findWithFalsyData()
         .exec(casper.db(req, res));
     });
-    t.ok(res.jsonp.withArgs(404, {}).calledOnce, '404 jsonp was called once');
+    t.ok(res.jsonp.withArgs(404).calledOnce, '404 jsonp was called once');
     t.end();
+  });
+
+  t.test('calls errback with error data', function (t) {
+    setup();
+    app.get('/', function (req, res) {
+      FakeModel
+        .findWithError()
+        .exec(casper.db(req, res, function () {}, function (err) {
+          t.pass('errback was called');
+          t.end();
+        }));
+    });
+  });
+
+  t.test('calls errback with falsey data', function (t) {
+    setup();
+    app.get('/', function (req, res) {
+      FakeModel
+        .findWithFalsyData()
+        .exec(casper.db(req, res, function () {}, function (err) {
+          t.pass('errback was called');
+          t.end();
+        }));
+    });
   });
 
   t.end();

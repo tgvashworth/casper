@@ -7,7 +7,7 @@ var casper = {};
 // ==================================
 // Send data or and empty response
 // ==================================
-casper.noop = function (data) {
+casper.send = casper.noop = function (data) {
   return function (req, res) {
     res.jsonp(data || {});
   };
@@ -18,18 +18,37 @@ casper.noop = function (data) {
 // ==================================
 
 // ==================================
-// Generic database response handler.
+// Generic response handler.
+// Use in a database callback to automatically serve the retrieved data, or a
+// 404 if none is found. You can also supply a callback to be called when no
+// error was generated and some data was returned, and an errorback for any
+// other situation.
+//
+// Example:
+//
+//   User.find({}).exec(casper.respond(req, res))
+//
+//   User.find({}).exec(casper.respond(req, res, function (err, data) {
+//     // err will always be falsey
+//     . . .
+//   }));
+//
+//   User.find({}).exec(casper.respond(req, res, function (err, data) {
+//     . . .
+//   }, function (err) {
+//     // This will called if there was an error or no data.
+//     . . .
+//   }));
+//
+//  Returns a function that accepts two parameters. error  dat
 // ==================================
-casper.db = function (req, res, cb) {
+casper.respond = casper.db = function (req, res, cb, errb) {
   return function (err, data) {
     if (err) {
-      return (cb ? cb(err, data) : res.jsonp(500, { error: err.message }));
+      return (errb ? errb(err) : res.jsonp(500, { error: err.message }));
     }
     if (!data) {
-      return (cb ? cb(err, data) : res.jsonp(404, {}));
-    }
-    if ('length' in data && data.length === 0) {
-      return (cb ? cb(err) : res.jsonp(404, []));
+      return (errb ? errb(err, data) : res.jsonp(404, { error: 'Not found.' }));
     }
     if (cb) return cb(err, data);
     return res.jsonp(data);
@@ -38,6 +57,7 @@ casper.db = function (req, res, cb) {
 
 // ==================================
 // Generic model creator
+// Supply a model object (a constructor) that accepts an object for its data.
 // ==================================
 casper.create = function (Model, data, allowBody) {
   return function (req, res) {
