@@ -159,32 +159,32 @@ casper.allow.body = casper.allow.bind(null, 'body');
 // Errors
 // ==================================
 
-casper.error = {};
+casper.error = function (code, msg) {
+  return function (req, res) {
+    res.jsonp(code, { error: msg });
+  };
+};
 
 // ==================================
 // 400 Bad Request
 // ==================================
-casper.error.badRequest = function (msg) {
-  return function (req, res) {
-    res.jsonp(400, { error: msg || 'Bad request' });
-  };
-};
+casper.error.badRequest = casper.error.bind(null, 400);
 
 // ==================================
 // Logging
 // ==================================
 
-casper.log = {};
-
 // ==================================
 // Log a key from the request
 // ==================================
-casper.log.the = function (key) {
+casper.log = function (key) {
   return function (req, res, next) {
     console.log(key, casper.util.atString(req, key));
     next();
   };
 };
+
+casper.log.the = casper.log;
 
 // ==================================
 // Utils
@@ -193,9 +193,19 @@ casper.log.the = function (key) {
 casper.util = {};
 
 // ==================================
-// Access object key via string
+// Get or set object key via string.
+//
+// Examples:
+//
+//   var user = { name: { first: 'Tom' } },
+//       firstname;
+//   firstname = casper.util.at(user, 'name.first'); // Tom
+//   casper.util.at(user, 'name.first', 'Joe')
+//   firstname = casper.util.at(user, 'name.first'); // Joe
+//
+// Returns the original object.
 // ==================================
-casper.util.atString = function(obj, str, val) {
+casper.util.at = casper.util.atString = function(obj, str, val) {
   var args = [].slice.call(arguments);
   str = str.replace(/\[(\w+)\]/g, '.$1')
            .replace(/^\./, '');
