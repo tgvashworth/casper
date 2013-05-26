@@ -14,10 +14,6 @@ casper.send = casper.noop = function (data) {
 };
 
 // ==================================
-// Database
-// ==================================
-
-// ==================================
 // Generic response handler.
 // Use in a database callback to automatically serve the retrieved data, or a
 // 404 if none is found. You can also supply a callback to be called when no
@@ -56,6 +52,10 @@ casper.respond = casper.db = function (req, res, cb, errb) {
 };
 
 // ==================================
+// Database
+// ==================================
+
+// ==================================
 // Generic model creator
 // Supply a model object (a constructor) that accepts an object for its data.
 // ==================================
@@ -73,101 +73,87 @@ casper.create = function (Model, data, allowBody) {
 // Checks & filters
 // ==================================
 
-casper.check = {};
+casper.check = function (property, keys, cb) {
+  if (typeof keys === 'string') keys = [keys];
+  return function (req, res, next) {
+    if (!req[property]) return next();
+    var missing = [];
+    keys.forEach(function (key) {
+      var ok = true;
+      if (cb) ok = cb(req[property][key], req[property]);
+      if(!ok || typeof req[property][key] === "undefined") {
+        missing.push(key);
+      }
+    });
+    if (!missing.length) return next();
+    casper.error
+     .badRequest('Missing ' + missing.join(', ') + ' from ' + property + '.')(req, res);
+  };
+};
 
 // ==================================
 // Parameter checking callback
 // Optional checking function. Defaults to truth checking with !
 // ==================================
-casper.check.params = function (param, cb) {
-  return function (req, res, next) {
-    var cbPassed = true;
-    if (cb) cbPassed = cb(param, req.params);
-    if (!cbPassed || typeof req.params[param] === "undefined") {
-      return casper
-               .error
-               .badRequest('Missing ' + param + ' URL parameter.')(req, res);
-    }
-    next();
-  };
-};
+casper.check.params = casper.check.bind(null, 'params');
 
 // ==================================
 // Body checking.
 // Like above, suports cb checking function.
 // ==================================
-casper.check.body = function (key, cb) {
-  return function (req, res, next) {
-    var cbPassed = true;
-    if (cb) cbPassed = cb(key, req.body);
-    if (!cbPassed || typeof req.body[key] === "undefined") {
-      return casper
-               .error
-               .badRequest('Missing ' + key + ' from body.')(req, res);
-    }
-    next();
-  };
-};
+casper.check.body = casper.check.bind(null, 'body');
 
 // ==================================
 // Query checking.
 // Like above, suports cb checking function.
 // ==================================
-casper.check.query = function (key, cb) {
-  return function (req, res, next) {
-    console.log('query', req.query);
-    var cbPassed = true;
-    if (cb) cbPassed = cb(key, req.query);
-    if (!cbPassed || typeof req.query[key] === "undefined") {
-      console.log('MISSING');
-      return casper
-               .error
-               .badRequest('Missing ' + key + ' from query.')(req, res);
-    }
-    next();
-  };
-};
+casper.check.query = casper.check.bind(null, 'query');
 
 // ==================================
 // Remove
 // ==================================
 
-casper.rm = {};
+casper.rm = function (property, keys) {
+  if (typeof keys === 'string') keys = [keys];
+  return function (req, res, next) {
+    if (!req[property]) return next();
+    keys.forEach(function (key) {
+      if (req[property][key]) {
+        delete req[property][key];
+      }
+    });
+    next();
+  };
+};;
 
 // ==================================
 // Remove key from req.body
 // ==================================
-casper.rm.body = function (key) {
-  return function (req, res, next) {
-    if (req.body[key]) {
-      delete req.body[key];
-    }
-    next();
-  };
-};
+casper.rm.body = casper.rm.bind(null, 'body');
 
 // ==================================
 // Allow
 // ==================================
 
-casper.allow = {};
-
-// ==================================
-// Only allow certain keys on the body
-// ==================================
-
-casper.allow.body = function (keys) {
+casper.allow = function (property, keys) {
   if (typeof keys === 'string') keys = [keys];
   return function (req, res, next) {
+    if (!req[property]) return next();
     // Remove all unwanted keys from the body
-    Object.keys(req.body).forEach(function (key) {
+    Object.keys(req[property]).forEach(function (key) {
       if (keys.indexOf(key) === -1) {
-        delete req.body[key];
+        delete req[property][key];
       }
     });
     next();
   };
 };
+
+// ==================================
+// Only allow certain keys on the body
+// ==================================
+
+casper.allow.body = casper.allow.bind(null, 'body');
 
 // ==================================
 // Errors

@@ -186,6 +186,77 @@ test('database', function (t) {
 // ==================================
 test('checks & filters', function (t) {
 
+  t.test('generic', function (t) {
+
+    t.test('missing parameter is caught', function (t) {
+      setup();
+      app.get('/',
+              casper.check('params', 'testParam'),
+              casper.noop());
+      app.get('/:testParam',
+              casper.check('params', 'testParam'),
+              casper.noop());
+      t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
+      t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
+      t.end();
+    });
+
+    t.test('missing body keys are caught', function (t) {
+      setup();
+      app.get('/',
+              casper.check('body', ['fakeKey', 'gibberish']),
+              casper.noop());
+      app.get('/',
+              casper.check('body', ['testKey', 'gibberish']),
+              casper.noop());
+      t.ok(res.jsonp.withArgs(400).calledTwice, '400 jsonp was called twice');        t.end();
+    });
+
+    t.test('missing body key is caught', function (t) {
+      setup();
+      app.get('/',
+              casper.check('body', 'fakeKey'),
+              casper.noop());
+      app.get('/',
+              casper.check('body', 'testKey'),
+              casper.noop());
+      t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
+      t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
+      t.end();
+    });
+
+    t.test('zero parameter is allowed', function (t) {
+      setup();
+      app.get('/',
+              casper.check('body', 'zeroKey'),
+              casper.noop());
+      t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
+      t.end();
+    });
+
+  });
+
+  t.test('callback', function (t) {
+
+    t.test('body can be matched with callback', function (t) {
+      setup();
+      app.get('/',
+              casper.check('body', 'testKey', function (value) {
+                return value === true;
+              }),
+              casper.noop());
+      app.get('/',
+              casper.check('body', 'testKey', function (value) {
+                return value === 'nose';
+              }),
+              casper.noop());
+      t.ok(res.jsonp.withArgs({}).calledOnce, '200 jsonp called once');
+      t.ok(res.jsonp.withArgs(400).calledOnce, '400 jsonp was called once');
+      t.end();
+    });
+
+  });
+
   t.test('missing parameter is caught', function (t) {
     setup();
     app.get('/',
@@ -221,15 +292,42 @@ test('checks & filters', function (t) {
     t.end();
   });
 
-  t.test('key is removed from body', function (t) {
-    setup();
-    var spy = sinon.spy(casper.noop());
-    app.get('/',
-            casper.rm.body('testKey'),
-            function (req, res) {
-              t.notOk(req.body.testKey, 'Test key removed.');
-              t.end();
-            });
+  t.test('rm', function (t) {
+
+    t.test('key is removed from body with generic rm', function (t) {
+      setup();
+      var spy = sinon.spy(casper.noop());
+      app.get('/',
+              casper.rm('body', 'testKey'),
+              function (req, res) {
+                t.notOk(req.body.testKey, 'Test key removed.');
+                t.end();
+              });
+    });
+
+    t.test('keys are removed from body with generic rm', function (t) {
+      setup();
+      var spy = sinon.spy(casper.noop());
+      app.get('/',
+              casper.rm('body', ['testKey', 'stringKey']),
+              function (req, res) {
+                t.notOk(req.body.testKey, 'testKey removed.');
+                t.notOk(req.body.stringKey, 'stringKey removed.');
+                t.end();
+              });
+    });
+
+    t.test('key is removed from body', function (t) {
+      setup();
+      var spy = sinon.spy(casper.noop());
+      app.get('/',
+              casper.rm.body('testKey'),
+              function (req, res) {
+                t.notOk(req.body.testKey, 'Test key removed.');
+                t.end();
+              });
+    });
+
   });
 
   t.test('only supplied key is allowed in body', function (t) {
