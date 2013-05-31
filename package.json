@@ -1,6 +1,6 @@
 {
   "name": "casper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Helpers and handlers for building APIs in express.",
   "main": "index.js",
   "scripts": {
