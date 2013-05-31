@@ -59,10 +59,10 @@ casper.respond = casper.db = function (req, res, cb, errb) {
 // Generic model creator
 // Supply a model object (a constructor) that accepts an object for its data.
 // ==================================
-casper.create = function (Model, data, allowBody) {
+casper.create = function (Model, data, allowBody, cb) {
   return function (req, res) {
     var raw = new Model(data || (allowBody ? req.body : {}));
-    raw.save(function (err, obj) {
+    raw.save(cb || function (err, obj) {
       if (err) return res.jsonp(500, err);
       res.jsonp(obj);
     });
